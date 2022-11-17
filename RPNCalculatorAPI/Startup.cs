@@ -7,6 +7,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using RPNCalculatorAPI.IServices;
+using RPNCalculatorAPI.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,6 +30,12 @@ namespace RPNCalculatorAPI
         {
 
             services.AddControllers();
+            
+            // injecting services into the pipeline
+            services.AddSingleton<IOperation, OperationService>();
+            services.AddSingleton<IOperationIdentifier, OperationIdentifierService>();
+            services.AddSingleton<IOperationHandler, OperationHandlerService>();
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "RPNCalculatorAPI", Version = "v1" });
