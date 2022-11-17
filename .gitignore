@@ -1,0 +1,10 @@
+
+*.dll
+*.exe
+*.cache
+*.pdb
+*.v2
+*.BuildWithSkipAnalyzers
+*.CopyComplete
+*.v2
+*.json
