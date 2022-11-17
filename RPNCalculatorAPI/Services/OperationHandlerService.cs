@@ -1,4 +1,5 @@
-﻿using RPNCalculatorAPI.IServices;
+﻿using RPNCalculatorAPI.CustomExceptions;
+using RPNCalculatorAPI.IServices;
 using RPNCalculatorAPI.Models;
 using System.Collections.Concurrent;
 
@@ -19,36 +20,51 @@ namespace RPNCalculatorAPI.Services
 
         public ConcurrentStack<int> Compute(string input)
         {
+            InProcessOperation p = CheckInput(input);
+
+            switch (p.OperationType)
+            {
+                case OperationType.Add:
+                    p.OperationResult = _operation.Add(p.SecondNumber, p.FirstNumber);
+                    break;
+                case OperationType.Substract:
+                    p.OperationResult = _operation.Substract(p.SecondNumber, p.FirstNumber);
+                    break;
+                case OperationType.Divide:
+                    p.OperationResult = _operation.Divide(p.SecondNumber, p.FirstNumber);
+                    break;
+                case OperationType.Multiply:
+                    p.OperationResult = _operation.Multiply(p.SecondNumber, p.FirstNumber);
+                    break;
+            }
+            _stack.Push(p.OperationResult);
+            return _stack;
+        }
+
+        private InProcessOperation CheckInput(string input)
+        {
             OperationType type = _identifier.IdentiftOperationType(input);
             int operationResult = default(int);
             int firstNumber = default(int);
             int secondNumber = default(int);
+            bool isFirst = false;
+            bool isSecond = false;
             if (type == OperationType.NOT_OPERATOR)
             {
-                var isNumber = int.TryParse(input, out operationResult);
+                int.TryParse(input, out operationResult);
             }
             else
             {
-                _stack.TryPop(out firstNumber);
-                _stack.TryPop(out secondNumber);
+                isFirst = _stack.TryPop(out firstNumber);
+                isSecond = _stack.TryPop(out secondNumber);
+                if (!(isFirst && isSecond))
+                {
+                    throw new NotEnoughNumbersException("You can not use an operator before entering at least two consecutive numbers!");
+                }
             }
-            switch (type)
-            {
-                case OperationType.Add:
-                    operationResult = _operation.Add(secondNumber, firstNumber);
-                    break;
-                case OperationType.Substract:
-                    operationResult = _operation.Substract(secondNumber, firstNumber);
-                    break;
-                case OperationType.Divide:
-                    operationResult = _operation.Divide(secondNumber, firstNumber);
-                    break;
-                case OperationType.Multiply:
-                    operationResult = _operation.Multiply(secondNumber, firstNumber);
-                    break;
-            }
-            _stack.Push(operationResult);
-            return _stack;
+            InProcessOperation inProcessOperation = new InProcessOperation(firstNumber, secondNumber, operationResult, type);
+            return inProcessOperation;
         }
+
     }
 }
