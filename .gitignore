@@ -8,3 +8,9 @@
 *.CopyComplete
 *.v2
 *.json
+*.v2
+*.targets
+*.props
+*.manifest
+*.testlog
+*.v2

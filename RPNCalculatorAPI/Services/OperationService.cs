@@ -2,7 +2,7 @@
 
 namespace RPNCalculatorAPI.Services
 {
-    public class OperationService : IOperations
+    public class OperationService : IOperation
     {
         public int Add(int x, int y)
         {
