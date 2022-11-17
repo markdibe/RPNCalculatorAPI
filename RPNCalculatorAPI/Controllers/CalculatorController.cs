@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using RPNCalculatorAPI.IServices;
+using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -10,19 +12,21 @@ namespace RPNCalculatorAPI.Controllers
     [ApiController]
     public class CalculatorController : ControllerBase
     {
-        private readonly ConcurrentStack<int> _stack;
-        public CalculatorController()
+        private readonly IOperationHandler _operationHander;
+
+        public CalculatorController(IOperationHandler operationHandler)
         {
-            _stack = new ConcurrentStack<int>();
+            _operationHander = operationHandler;
         }
 
         [HttpPost]
-        public void Push([FromBody]string input)
+        public ConcurrentStack<int> Push([FromBody] string input)
         {
-
+            var stack = _operationHander.Compute(input);
+            return stack;
         }
 
 
-        
+
     }
 }
