@@ -17,5 +17,7 @@ namespace RPNCalculatorAPI.Models
         public int OperationResult { get; set; }
 
         public OperationType OperationType { get; set; }
+
+
     }
 }

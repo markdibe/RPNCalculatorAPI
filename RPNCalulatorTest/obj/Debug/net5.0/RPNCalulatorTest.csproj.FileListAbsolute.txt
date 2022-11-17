@@ -113,3 +113,4 @@ C:\Users\User\source\repos\RPNCalculatorAPI\RPNCalulatorTest\obj\Debug\net5.0\RP
 C:\Users\User\source\repos\RPNCalculatorAPI\RPNCalulatorTest\obj\Debug\net5.0\ref\RPNCalulatorTest.dll
 C:\Users\User\source\repos\RPNCalculatorAPI\RPNCalulatorTest\bin\Debug\net5.0\Castle.Core.dll
 C:\Users\User\source\repos\RPNCalculatorAPI\RPNCalulatorTest\bin\Debug\net5.0\Moq.dll
+C:\Users\User\source\repos\RPNCalculatorAPI\RPNCalulatorTest\bin\Debug\net5.0\Xunit.Priority.dll
