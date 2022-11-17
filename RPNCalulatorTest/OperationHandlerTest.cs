@@ -1,6 +1,7 @@
 ﻿using Moq;
 using RPNCalculatorAPI.CustomExceptions;
 using RPNCalculatorAPI.IServices;
+using RPNCalculatorAPI.Services;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -14,103 +15,109 @@ namespace RPNCalulatorTest
 {
     public class OperationHandlerTest
     {
-        private readonly Mock<IOperationHandler> _operationHandler;
-        private static readonly ConcurrentDictionary<int, ConcurrentStack<int>> stack = new ConcurrentDictionary<int, ConcurrentStack<int>>();
+        private readonly IOperationHandler _operationHandler;
+        private static readonly ConcurrentDictionary<int, ConcurrentStack<int>> expectedStacks = new ConcurrentDictionary<int, ConcurrentStack<int>>();
+
+
         public OperationHandlerTest()
         {
-            _operationHandler = new Mock<IOperationHandler>();
-           
+            _operationHandler = new OperationHandlerService(new OperationIdentifierService(), new OperationService());
+            _operationHandler.CreateNew();
+            expectedStacks[1] = new ConcurrentStack<int>();
         }
 
-        [Fact,Priority(1)]
+        [Fact]
         public void ShouldAddANewStack()
         {
-            _operationHandler.Setup(x => x.CreateNew());
-            stack[1] = new ConcurrentStack<int>();
-            _operationHandler.Setup(x => x.GetDictionary()).Returns(stack);
+            Assert.Single(_operationHandler.GetDictionary());
         }
 
-        //[Fact, Priority(2)]
-        //public void ShouldInsertANumberInStack()
-        //{
-        //     _operationHandler.Setup(x => x.CreateNew());
-        //    stack[1] = new ConcurrentStack<int>();
-        //    string input = "2";
-        //    stack[1].Push(2);
-        //    _operationHandler.Setup(x => x.Compute(input, 1));
-        //    _operationHandler.Setup(x => x.GetStack(1)).Returns(stack[1]);
-        //}
+        [Fact]
+        public void ShouldInsertANumberInStack()
+        {
+            string input = "2";
+            expectedStacks[1].Push(2);
+            _operationHandler.Compute(input, 1);
+            var result = _operationHandler.GetStack(1);
+            Assert.Equal(expectedStacks[1], result);
+        }
 
-        //[Fact, Priority(3)]
-        //public void ShouldInsertAnotherNumberInStack()
-        //{
-        //    string input = "5";
-        //    stack[1].Push(5);
-        //    _operationHandler.Setup(x => x.Compute(input,1));
-        //    _operationHandler.Setup(x => x.GetStack(1)).Returns(stack[1]);
-        //}
+        [Fact]
+        public void ShouldInsertAnotherNumberInStack()
+        {
+            _operationHandler.Compute("1", 1);
+            _operationHandler.Compute("2",1);
+            var result = _operationHandler.GetStack(1);
+            Assert.Equal(2, result.Count);
+        }
 
-        //[Fact]
+        [Fact]
 
-        //public void ShouldAddTheTwoNumbers()
-        //{
-        //    //the result should be 7
-        //    string input = "+";
-        //    stack.TryPop(out int firstNumber);
-        //    stack.TryPop(out int secondNumber);
-        //    int result = firstNumber + secondNumber;
-        //    stack.Push(result);
-        //    _operationHandler.Setup(x => x.Compute(input)).Returns(stack);
-        //}
+        public void ShouldAddTheTwoNumbers()
+        {
+            //the result should be 7
 
-        //[Fact]
-        //public void ShouldSubstractTheTwoNumbers()
-        //{
-        //    //the result should be 4
-        //    string input = "3";
-        //    _operationHandler.Setup(x => x.Compute(input));
-        //    input = "-";
-        //    stack.TryPop(out int aNumber);
-        //    int result = aNumber + 3;
-        //    stack.Push(result);
-        //    _operationHandler.Setup(x => x.Compute(input)).Returns(stack);
-        //}
+            string input = "2";
+            expectedStacks[1].Push(2);
+            _operationHandler.Compute(input, 1);
+            input = "5";
+            expectedStacks[1].Push(5);
+            _operationHandler.Compute(input, 1);
+            input = "+";
+            expectedStacks[1].TryPop(out int firstNumber);
+            expectedStacks[1].TryPop(out int secondNumber);
+            int expectedResult = firstNumber + secondNumber;
+            expectedStacks[1].Push(expectedResult);
+            _operationHandler.Compute(input, 1);
+            var result = _operationHandler.GetStack(1);
+            Assert.Equal(expectedStacks[1], result);
+        }
 
-        //[Fact]
-        //public void ShouldMultiplyTwoNumbers()
-        //{
-        //    //result should be 16
-        //    string input = "4";
-        //    stack.Push(4);
-        //    _operationHandler.Setup(x => x.Compute(input));
-        //    input = "*";
-        //    stack.TryPop(out int aNumber);
-        //    int result = aNumber * 4;
-        //    stack.Push(result);
-        //    _operationHandler.Setup(x => x.Compute(input)).Returns(stack);
-        //}
+        [Fact]
+        public void ShouldSubstractTheTwoNumbers()
+        {
+            _operationHandler.Compute("7", 1);
+            _operationHandler.Compute("2", 1);
+            _operationHandler.Compute("-", 1);
+            _operationHandler.GetStack(1).TryPeek(out int result);
+            Assert.Equal(5, result);
+        }
 
-        //[Fact]
-        //public void ShouldDivideTwoNumbers()
-        //{
-        //    // result should be 8
-        //    string input = "2";
-        //    stack.Push(2);
-        //    _operationHandler.Setup(x => x.Compute(input));
-        //    input = "/";
-        //    stack.TryPop(out int aNumber);
-        //    int result = aNumber / 2;
-        //    stack.Push(result);
-        //    _operationHandler.Setup(x => x.Compute(input)).Returns(stack);
-        //}
+        [Fact]
+        public void ShouldMultiplyTwoNumbers()
+        {
+            //result should be 16
+            string input = "4";
+            string input2 = "5";
+            _operationHandler.Compute(input, 1);
+            _operationHandler.Compute(input2, 1);
+            _operationHandler.Compute("*", 1);
+            _operationHandler.GetStack(1).TryPeek(out int result);
+            Assert.Equal(20, result);
 
-        //[Fact]
-        //public void ShouldThrowException()
-        //{
-        //    string input = "/";
-        //    _operationHandler.Setup(x => x.Compute(input))
-        //        .Throws(new NotEnoughNumbersException(string.Empty));
-        //}
+        }
+
+        [Fact]
+        public void ShouldDivideTwoNumbers()
+        {
+            // result should be 8
+            string input = "16";
+            string input2 = "2";
+            _operationHandler.Compute(input, 1);
+            _operationHandler.Compute(input2, 1);
+            _operationHandler.Compute("/", 1);
+            _operationHandler.GetStack(1).TryPeek(out int result);
+            Assert.Equal(8, result);
+        }
+
+
+        [Fact]
+        public void ShouldRemoveStack()
+        {
+            _operationHandler.CreateNew();
+            _operationHandler.DeleteStack(2);
+            Assert.Single(_operationHandler.GetDictionary());
+        }
 
     }
 }
