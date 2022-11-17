@@ -1,6 +1,6 @@
 ﻿namespace RPNCalculatorAPI.IServices
 {
-    public interface IOperations
+    public interface IOperation
     {
         int Add(int x, int y);
         int Substract(int x, int y);
