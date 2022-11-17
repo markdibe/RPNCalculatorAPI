@@ -1,6 +1,7 @@
 ﻿using RPNCalculatorAPI.IServices;
+using RPNCalculatorAPI.Models;
 
-namespace RPNCalculatorAPI.Models
+namespace RPNCalculatorAPI.Services
 {
     public class OperationIdentifierService : IOperationIdentifier
     {
